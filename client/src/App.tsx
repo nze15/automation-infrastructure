@@ -4,13 +4,32 @@ import NotFound from "@/pages/NotFound";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import { useAuth } from "./_core/hooks/useAuth";
+import DashboardLayout from "./components/DashboardLayout";
 import Home from "./pages/Home";
+import Dashboard from "./pages/Dashboard";
+import Workflows from "./pages/Workflows";
+import Webhooks from "./pages/Webhooks";
+import AIWorkflowBuilder from "./pages/AIWorkflowBuilder";
 
 function Router() {
-  // make sure to consider if you need authentication for certain routes
+  const { isAuthenticated, loading } = useAuth();
+
+  if (loading) {
+    return <div className="flex items-center justify-center h-screen">Loading...</div>;
+  }
+
   return (
     <Switch>
       <Route path={"/"} component={Home} />
+      {isAuthenticated && (
+        <>
+          <Route path={"/dashboard"} component={() => <DashboardLayout><Dashboard /></DashboardLayout>} />
+          <Route path={"/workflows"} component={() => <DashboardLayout><Workflows /></DashboardLayout>} />
+          <Route path={"/webhooks"} component={() => <DashboardLayout><Webhooks /></DashboardLayout>} />
+          <Route path={"/ai-builder"} component={() => <DashboardLayout><AIWorkflowBuilder /></DashboardLayout>} />
+        </>
+      )}
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
